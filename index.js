@@ -41,13 +41,24 @@ var getAccessToken = function (key, requestToken, callback) {
 
 };
 
-var getArticles = function (key, accessToken, callback) {
+var getArticles = function (key, accessToken, params, callback) {
+
+	if (!callback) {
+		callback = params;
+		params = {};
+	}
 
 	var options = {
 		headers: config.headers,
 		url: config.pocketUrl.get,
 		body: 'consumer_key=' + key + '&access_token=' + accessToken
 	};
+
+	for (var prop in params) {
+		// skip loop if the property is from prototype
+		if (!params.hasOwnProperty(prop)) continue;
+		options.body += '&' + prop + '=' + params[prop];
+	}
 
 	request.post(options, function (error, response, body) {
 		completePost(error, response, body, callback);
